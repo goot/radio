@@ -89,6 +89,7 @@ test('iPhone settings restore, autoplay recovers, and WMEX appears before the ne
   assert.equal(element('station-name').textContent,'Drone Zone');
   assert.equal(element('play-label').textContent,'Play');
   assert.match(element('play-error').textContent,/Press the large Play button/);
+  assert.equal(rootClasses.has('player-focus'),true,'blocked autoplay must not exit Player view');
   assert.equal(element('volume-value').textContent,'40%');
   assert.equal(element('volume-slider').hidden,true);
   assert.equal(element('device-volume').hidden,false);

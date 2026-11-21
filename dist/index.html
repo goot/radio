@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en" class="player-focus">
+<html lang="en" class="player-focus" data-release="20261121-7">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -13,8 +13,8 @@
   <link rel="icon" href="./icons/airwave.svg?v=1" type="image/svg+xml">
   <link rel="icon" href="./icons/favicon-32.png?v=1" type="image/png" sizes="32x32">
   <link rel="apple-touch-icon" href="./icons/apple-touch-icon.png?v=1" sizes="180x180">
-  <link rel="manifest" href="./manifest.webmanifest?v=1">
-  <link rel="stylesheet" href="./style.css?v=20261121-6">
+  <link rel="manifest" href="./manifest.webmanifest?v=20261121-7">
+  <link rel="stylesheet" href="./style.css?v=20261121-7">
 </head>
 <body>
   <a class="skip-link" href="#play-button">Skip to radio player</a>
@@ -30,7 +30,7 @@
       <header><span class="header-note">Live internet radio</span><button id="focus-player" aria-controls="main-player">Player view</button><button id="large-text" class="text-size-button" aria-pressed="false"><span aria-hidden="true">Aa</span> Larger text</button></header>
       <section class="intro"><h1>Your radio.</h1><p>Choose a station. Press Play.</p></section>
       <section id="main-player" class="main-player lime" aria-label="Current station">
-        <div class="player-toolbar"><span class="player-brand">airwave<span aria-hidden="true">.</span></span><button id="player-settings">Stations &amp; settings</button></div>
+        <div class="player-toolbar"><div><span class="player-brand">airwave<span aria-hidden="true">.</span></span><span class="release-label">Version 7</span></div><button id="player-settings">Stations &amp; settings</button></div>
         <div class="station-identity"><div id="station-art" class="station-art" aria-hidden="true"></div><div class="station-copy"><p id="play-status" class="eyebrow">Ready to play</p><h2 id="station-name">Groove Salad</h2><p id="station-detail">United States · Chill</p></div></div>
         <button id="play-button" class="big-play" aria-label="Play radio"><span id="play-icon" aria-hidden="true">▶</span><span id="play-label">Play</span></button>
         <p id="playback-announcement" class="sr-only" role="status" aria-atomic="true"></p>
@@ -42,11 +42,11 @@
       <p id="storage-error" class="notice" role="status" hidden></p>
       <section id="browse-controls" aria-label="Find stations"><form id="search-form" class="search" role="search"><label for="query">Find a station</label><div class="search-row"><input id="query" type="search" enterkeyhint="search" placeholder="Station name or call letters" autocomplete="off" spellcheck="false"><button type="submit">Search</button></div></form><div id="genres" class="genres" role="group" aria-label="Filter by genre"></div></section>
       <section aria-label="Stations"><div class="section-heading"><h2 id="list-title" tabindex="-1">Featured stations</h2><a class="back-to-player" href="#play-button">Back to player</a></div><p id="result-count" role="status" aria-atomic="true"></p><p id="directory-error" class="notice" role="alert" hidden></p><div id="stations" class="station-grid"></div></section>
-      <footer><p>Settings stay in this browser for up to one year.<br>Clearing cookies removes your saved stations and settings.</p><p>Stations from <a href="https://somafm.com" target="_blank" rel="noreferrer">SomaFM</a>, <a href="https://1059wmex.com" target="_blank" rel="noreferrer">WMEX</a>, and <a href="https://www.radio-browser.info" target="_blank" rel="noreferrer">Radio Browser</a>.</p><button id="clear-settings">Clear saved settings</button></footer>
+      <footer><p>Settings stay in this browser for up to one year.<br>Clearing cookies removes your saved stations and settings.</p><p>Stations from <a href="https://somafm.com" target="_blank" rel="noreferrer">SomaFM</a>, <a href="https://1059wmex.com" target="_blank" rel="noreferrer">WMEX</a>, and <a href="https://www.radio-browser.info" target="_blank" rel="noreferrer">Radio Browser</a>.</p><p>Version 7 · <a href="./player.html?v=20261121-7">Reload app</a></p><button id="clear-settings">Clear saved settings</button></footer>
     </main>
   </div>
   <audio id="audio" preload="none"></audio>
   <noscript>Enable JavaScript to search for stations and play radio.</noscript>
-  <script type="module" src="./app.js?v=20261121-6"></script>
+  <script type="module" src="./app.js?v=20261121-7"></script>
 </body>
 </html>

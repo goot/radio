@@ -211,6 +211,7 @@ html.player-focus .main-player {
 }
 html.player-focus .player-toolbar { grid-column: 1 / -1; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: .5rem 1rem; }
 .player-brand { color: var(--green); font-size: 1.5rem; font-weight: 800; letter-spacing: -.05em; }
+.release-label { display: block; color: var(--muted); font-size: .85rem; }
 html.player-focus .station-identity { display: flex; flex-wrap: nowrap; align-items: center; gap: 1.2rem; min-width: 0; }
 html.player-focus .station-art { flex: 0 0 clamp(88px, 22vh, 220px); }
 html.player-focus .artwork.large { height: clamp(88px, 22vh, 220px); }

@@ -23,6 +23,8 @@ jobs:
     steps:
       - name: Check out source
         uses: actions/checkout@v6
+      - name: Prepare Home Screen launch page
+        run: node scripts/prepare-site.mjs
       - name: Check the app
         run: |
           node --test tests/*.test.mjs

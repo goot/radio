@@ -21,13 +21,15 @@ On iPhone and iPad, use the device volume buttons. The app hides its volume slid
 
 ## Add to the iPhone Home Screen
 
-1. Open the site in Safari.
+1. Open [the Player launch page](https://goot.github.io/radio/player.html?v=20261121-7) in Safari. Confirm that **Version 7** appears below the Airwave name.
 2. Open the **Share** menu.
 3. Select **Add to Home Screen**.
 4. Enable **Open as Web App** if the option appears.
 5. Select **Add**.
 
 The Home Screen icon uses a green radio on a dark background. Its name is **Airwave**. If you saved an older icon, remove that shortcut and add the site again. Live radio still needs an internet connection.
+
+The manifest starts new installations at `player.html`. The deployment workflow generates this file from `index.html` with `node scripts/prepare-site.mjs`. The two pages use the same assets and cookie path. The new launch address avoids an older cached index page. An existing installation may retain its old launch address. Check the visible version number before replacing an older shortcut. A new Home Screen installation may require you to select the default station again.
 
 The editable icon is `dist/icons/airwave.svg`. The app includes PNG icons at 32, 180, 192, and 512 pixels. The 180-pixel icon is for iPhone. The web app manifest uses relative paths so installation also works under `/radio/`.
 
@@ -56,6 +58,8 @@ This repository includes a deployment workflow in `.github/workflows/pages.yml`.
 GitHub Pages can cache files for 10 minutes. For a new release, update the `v=` values in `dist/index.html`, `dist/app.js`, and `dist/cookies.js` together. These version values prevent an old JavaScript or CSS file from being used with a new page.
 
 To publish only the static files in a separate repository without a workflow, use these steps:
+
+First, copy `dist/index.html` to `dist/player.html`, or run `node scripts/prepare-site.mjs`. This prepares the Home Screen launch page without compilation.
 
 1. Create a public GitHub repository.
 2. Upload the contents of `dist/` to the repository root. Include the hidden `.nojekyll` file.
