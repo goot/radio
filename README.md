@@ -49,7 +49,9 @@ The app limits its cookie data to 6 KB to avoid large request headers. It also l
 ## Station sources and limits
 
 - [Radio Browser](https://docs.radio-browser.info/) supplies search results. Two directory servers provide fallback. Searches have a timeout and can be cancelled.
-- [SomaFM](https://somafm.com/listen/) supplies the featured streams. Direct stream addresses can change. Update `dist/stations.js` if a featured stream stops working.
+- [SomaFM](https://somafm.com/listen/) supplies six featured streams.
+- [WMEX-LP 105.9 FM](https://1059wmex.com/) in Rochester, New Hampshire, is included directly. Its provider's HTTPS stream works with this site. The directory's HTTP stream is excluded. Search results include matching featured stations, even if the directory is unavailable.
+- Direct stream addresses can change. Update `dist/stations.js` if a featured stream stops working.
 - The browser connects directly to station providers. Only HTTPS streams are listed. HLS streams are omitted because this app has no additional streaming library.
 - A station can be unavailable or restricted by location. The app shows connection errors and permits retry.
 - The app contains no tracking code. Station providers receive playback requests. Radio Browser receives searches. Google Fonts supplies optional fonts.

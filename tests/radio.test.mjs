@@ -31,6 +31,24 @@ test('cancelled searches do not retry', async () => {
   finally { globalThis.fetch = oldFetch; }
 });
 
+test('WMEX search uses its secure direct stream when the directory is empty or unavailable', async () => {
+  const oldFetch = globalThis.fetch;
+  try {
+    for (const unavailable of [false, true]) {
+      globalThis.fetch = async () => {
+        if (unavailable) throw new Error('offline');
+        return {ok:true,json:async()=>[]};
+      };
+      const stations = await searchStations('WMEX','All stations',new AbortController().signal);
+      assert.equal(stations.length,1);
+      assert.equal(stations[0].country,'Rochester, New Hampshire');
+      assert.equal(stations[0].url,'https://broadcast.shoutcheap.com/proxy/rochest1/stream');
+    }
+    globalThis.fetch = async () => ({ok:true,json:async()=>[]});
+    assert.equal((await searchStations('WMEX','Jazz',new AbortController().signal)).length,0);
+  } finally { globalThis.fetch = oldFetch; }
+});
+
 test('cookies restore multiple stations, default, and volume; clear preserves unrelated cookies', async () => {
   const jar = new Map([['unrelated','keep']]);
   globalThis.location = new URL('https://example.com/radio/');

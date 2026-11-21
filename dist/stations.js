@@ -7,6 +7,19 @@ export const featured = [
   { id: 'bootliquor', name: 'Boot Liquor', genre: 'Country', detail: 'Americana, roots, and country music.', color: 'yellow', country: 'United States' },
 ].map(s => ({ ...s, url: `https://ice6.somafm.com/${s.id}-128-mp3`, homepage: `https://somafm.com/${s.id}/`, provider: 'SomaFM' }));
 
+// The directory resolves WMEX's playlist to HTTP. Use the provider's verified HTTPS stream.
+featured.push({
+  id: 'wmex-lp-1059',
+  name: 'WMEX-LP 105.9 FM',
+  genre: 'Oldies',
+  country: 'Rochester, New Hampshire',
+  color: 'blue',
+  url: 'https://broadcast.shoutcheap.com/proxy/rochest1/stream',
+  homepage: 'https://1059wmex.com/',
+  logo: 'https://img1.wsimg.com/isteam/ip/fd2ab2f7-88f9-4450-aac5-a0b05f494bbc/WMEX%20LOGO%20W-80S.PNG',
+  provider: 'WMEX',
+});
+
 export function secureUrl(value) {
   try { const url = new URL(value); return url.protocol === 'https:' && !url.username && !url.password ? url.href : ''; }
   catch { return ''; }
@@ -23,6 +36,12 @@ export function normalizeStations(rows) {
 }
 
 export async function searchStations(query, genre, signal) {
+  signal.throwIfAborted();
+  const terms = query.trim().toLowerCase().split(/\s+/).filter(Boolean);
+  const local = featured.filter(station => {
+    const text = `${station.name} ${station.country} ${station.genre}`.toLowerCase();
+    return terms.every(term => text.includes(term)) && (genre === 'All stations' || station.genre.toLowerCase() === genre.toLowerCase());
+  });
   const params = new URLSearchParams({ name: query, hidebroken: 'true', order: 'votes', reverse: 'true', limit: '100', is_https: 'true' });
   if (genre !== 'All stations') params.set('tag', genre.toLowerCase());
   const servers = ['https://de1.api.radio-browser.info', 'https://nl1.api.radio-browser.info'];
@@ -33,9 +52,11 @@ export async function searchStations(query, genre, signal) {
       if (!response.ok) throw new Error('Directory request failed');
       const rows = await response.json();
       if (!Array.isArray(rows)) throw new Error('Invalid station list');
-      return normalizeStations(rows);
+      const seenUrls = new Set(local.map(station => station.url));
+      return [...local, ...normalizeStations(rows).filter(station => !seenUrls.has(station.url))];
     } catch (error) { if (signal.aborted) throw error; }
   }
+  if (local.length) return local;
   throw new Error('The station directory is unavailable. Try again, or play a featured station.');
 }
 
