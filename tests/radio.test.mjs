@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { featured, normalizeStations, searchStations, secureUrl } from '../dist/stations.js';
+import { featured, matchingFeatured, normalizeStations, searchStations, secureUrl } from '../dist/stations.js';
 
 test('station results reject unsafe streams and remove duplicate streams', () => {
   const row = { stationuuid:'one', name:' KEXP ', url_resolved:'https://example.com/radio', favicon:'javascript:alert(1)' };
@@ -32,6 +32,7 @@ test('cancelled searches do not retry', async () => {
 });
 
 test('WMEX search uses its secure direct stream when the directory is empty or unavailable', async () => {
+  assert.equal(matchingFeatured(' WMEX ', 'All stations')[0].id, 'wmex-lp-1059');
   const oldFetch = globalThis.fetch;
   try {
     for (const unavailable of [false, true]) {
@@ -73,11 +74,13 @@ test('cookies restore multiple stations, default, and volume; clear preserves un
   assert.equal(jar.get('unrelated'),'keep');
 });
 
-test('default station attempts playback and presents Play when autoplay is blocked', async () => {
-  const jar = new Map([['airwave_default',encodeURIComponent(JSON.stringify(featured[1]))],['airwave_volume','0.4']]);
+test('iPhone settings restore, autoplay recovers, and WMEX appears before the network responds', async () => {
+  const jar = new Map([['airwave_default',encodeURIComponent(JSON.stringify(featured[1]))],['airwave_volume','0.4'],['airwave_large_text','true']]);
   const elements = new Map();
+  const rootClasses = new Set();
+  Object.defineProperty(globalThis, 'navigator', {configurable:true,value:{userAgent:'iPhone',platform:'iPhone',maxTouchPoints:5}});
   function element(id) { if (!elements.has(id)) elements.set(id,{id,textContent:'',innerHTML:'',hidden:false,value:'',dataset:{},classList:{toggle(){}},listeners:{},addEventListener(name,fn){this.listeners[name]=fn;},setAttribute(name,value){this[name]=value;},removeAttribute(){},pause(){},load(){},replaceWith(next){elements.set(id,next);}}); return elements.get(id); }
-  globalThis.document = {getElementById:element,querySelectorAll:()=>[],addEventListener(){},get cookie(){return [...jar].map(([k,v])=>`${k}=${v}`).join('; ');},set cookie(value){ const pair=value.split(';')[0];const i=pair.indexOf('=');jar.set(pair.slice(0,i),pair.slice(i+1)); }};
+  globalThis.document = {documentElement:{classList:{toggle(name,on){if(on) rootClasses.add(name);else rootClasses.delete(name);}}},getElementById:element,querySelectorAll:()=>[],addEventListener(){},get cookie(){return [...jar].map(([k,v])=>`${k}=${v}`).join('; ');},set cookie(value){ const pair=value.split(';')[0];const i=pair.indexOf('=');jar.set(pair.slice(0,i),pair.slice(i+1)); }};
   let playedUrl;
   globalThis.Audio = class {constructor(){Object.assign(this,element('new-audio'));} async play(){playedUrl=this.src;throw new DOMException('Blocked','NotAllowedError');}};
   await import('../dist/app.js');
@@ -87,4 +90,26 @@ test('default station attempts playback and presents Play when autoplay is block
   assert.equal(element('play-label').textContent,'Play');
   assert.match(element('play-error').textContent,/Press the large Play button/);
   assert.equal(element('volume-value').textContent,'40%');
+  assert.equal(element('volume-slider').hidden,true);
+  assert.equal(element('device-volume').hidden,false);
+  assert.equal(rootClasses.has('large-text'),true);
+  element('large-text').listeners.click();
+  assert.equal(rootClasses.has('large-text'),false);
+  assert.equal(jar.get('airwave_large_text'),'false');
+  element('large-text').listeners.click();
+  assert.equal(jar.get('airwave_large_text'),'true');
+  assert.equal(element('play-button')['aria-label'],'Play Drone Zone');
+  const oldFetch = globalThis.fetch;
+  let resolveFetch;
+  globalThis.fetch = () => new Promise(resolve => {resolveFetch = resolve;});
+  try {
+    element('query').value = 'WMEX';
+    element('search-form').listeners.submit({preventDefault(){}});
+    assert.match(element('stations').innerHTML,/WMEX-LP 105\.9 FM/);
+    assert.match(element('result-count').textContent,/Searching the directory/);
+    resolveFetch({ok:true,json:async()=>[]});
+    await new Promise(resolve=>setTimeout(resolve,0));
+    assert.match(element('stations').innerHTML,/WMEX-LP 105\.9 FM/);
+    assert.equal(element('result-count').textContent,'1 station');
+  } finally { globalThis.fetch = oldFetch; }
 });

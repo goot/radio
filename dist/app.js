@@ -1,5 +1,5 @@
-import { featured, searchStations, secureUrl } from './stations.js';
-import { readCookie, writeCookie, readFavorites, validStation, clearCookies } from './cookies.js';
+import { featured, matchingFeatured, searchStations, secureUrl } from './stations.js?v=20261121-2';
+import { readCookie, writeCookie, readFavorites, validStation, clearCookies } from './cookies.js?v=20261121-2';
 
 const $ = id => document.getElementById(id);
 const colors = ['lime', 'purple', 'orange', 'blue', 'pink', 'yellow'];
@@ -13,6 +13,8 @@ let audio = $('audio');
 const savedVolume = readCookie('volume');
 let volume = typeof savedVolume === 'number' && savedVolume >= 0 && savedVolume <= 1 ? savedVolume : 0.7;
 let muted = readCookie('muted') === true;
+let largeText = readCookie('large_text') === true;
+const deviceVolume = /iPhone|iPad|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
 const escapeHtml = value => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;', "'":'&#39;'}[c]));
 const color = station => colors.includes(station.color) ? station.color : 'lime';
 const isSaved = station => favorites.some(s => s.id === station.id);
@@ -35,9 +37,11 @@ function renderPlayer() {
   $('station-detail').textContent = `${selected.country || 'International'} · ${selected.genre || 'Radio'}`;
   $('station-art').innerHTML = artwork(selected, true);
   $('main-player').className = `main-player ${color(selected)}`;
-  $('save-current').textContent = isSaved(selected) ? '♥ Saved station' : '♡ Save station';
+  $('save-current').textContent = isSaved(selected) ? 'Saved station' : 'Save station';
+  $('save-current').setAttribute('aria-label', isSaved(selected) ? `Saved station: ${selected.name}. Remove from favorites` : `Save station: ${selected.name}`);
   $('save-current').setAttribute('aria-pressed', isSaved(selected));
-  $('default-current').textContent = isDefault(selected) ? '★ Default station' : '☆ Set as default';
+  $('default-current').textContent = isDefault(selected) ? 'Default station' : 'Set as default';
+  $('default-current').setAttribute('aria-label', isDefault(selected) ? `Default station: ${selected.name}. Remove as default` : `Set as default: ${selected.name}`);
   $('default-current').setAttribute('aria-pressed', isDefault(selected));
   $('default-current').title = isDefault(selected) ? 'Remove the default station' : 'Play this station when you return';
   $('default-note').textContent = defaultStation ? `On return: ${defaultStation.name}. Playback starts if your browser allows it.` : 'Set a default station to play when you return.';
@@ -48,17 +52,20 @@ function renderPlayer() {
 }
 function updatePlayback() {
   const active = status === 'playing' || status === 'loading';
-  $('play-status').textContent = {idle:'READY TO PLAY', loading:'CONNECTING…', playing:'PLAYING LIVE', paused:'PAUSED', error:'STATION UNAVAILABLE'}[status];
+  const statusText = {idle:'Ready to play', loading:'Connecting…', playing:'Playing live', paused:'Paused', error:'Station unavailable'}[status];
+  $('play-status').textContent = statusText;
+  const announcement = `${selected.name}. ${statusText}`;
+  if ($('playback-announcement').textContent !== announcement) $('playback-announcement').textContent = announcement;
   $('play-icon').textContent = active ? 'Ⅱ' : '▶';
   $('play-label').textContent = active ? 'Pause' : 'Play';
-  $('play-button').setAttribute('aria-label', active ? 'Pause radio' : 'Play radio');
+  $('play-button').setAttribute('aria-label', `${active ? 'Pause' : 'Play'} ${selected.name}`);
   $('main-player').classList.toggle('is-playing', status === 'playing');
   document.title = `${status === 'playing' ? selected.name + ' — ' : ''}Airwave Radio`;
   document.querySelectorAll('[data-play]').forEach(button => {
     const station = displayed()[Number(button.dataset.play)];
     const current = station?.id === selected.id;
-    button.textContent = current && active ? 'Ⅱ' : '▶';
-    button.setAttribute('aria-label', `${current && active ? 'Pause' : 'Play'} ${station?.name || 'station'}`);
+    button.textContent = current && active ? 'Pause' : 'Play station';
+    button.setAttribute('aria-label', `${current && active ? 'Pause' : 'Play station:'} ${station?.name || 'station'}`);
     button.closest('.station-card').classList.toggle('is-current', current);
   });
 }
@@ -125,6 +132,7 @@ function toggleFavorite(station) {
     favorites.push(station);
   }
   renderPlayer(); renderStations();
+  $('settings-status').textContent = `${station.name} ${isSaved(station) ? 'saved to' : 'removed from'} favorites.`;
 }
 function toggleDefault() {
   if (isDefault(selected)) { if (persist('default', null)) defaultStation = null; }
@@ -133,29 +141,47 @@ function toggleDefault() {
     if (isSaved(selected) && persist('default', selected)) defaultStation = selected;
   }
   renderPlayer(); renderStations();
+  $('settings-status').textContent = defaultStation ? `${defaultStation.name} is the default station.` : 'The default station was removed.';
 }
 function displayed() { return view === 'favorites' ? favorites : results ?? featured; }
 function renderStations() {
+  const focused = document.activeElement;
+  const focusAction = focused?.dataset?.save !== undefined ? 'save' : 'play';
+  const focusIndex = focused?.dataset?.[focusAction];
+  const focusStationId = focused?.dataset?.stationId;
   $('favorite-count').textContent = favorites.length;
   $('discover').classList.toggle('active', view === 'discover');
   $('favorites').classList.toggle('active', view === 'favorites');
+  $('discover').setAttribute('aria-pressed', view === 'discover');
+  $('favorites').setAttribute('aria-pressed', view === 'favorites');
   $('browse-controls').hidden = view === 'favorites';
   $('list-title').textContent = view === 'favorites' ? 'Your saved stations' : results !== null ? 'Search results' : 'Featured stations';
-  $('result-count').textContent = loading && view === 'discover' ? 'Searching…' : `${displayed().length} stations`;
-  $('genres').innerHTML = ['All stations','Jazz','Chill','Rock','Electronic','Classical','News'].map(g => `<button data-genre="${g}" aria-pressed="${genre === g}" class="chip ${genre === g ? 'selected' : ''}">${g}</button>`).join('');
-  if (loading && view === 'discover') { $('stations').innerHTML = '<div class="empty" role="status">Loading the station directory…</div>'; return; }
+  const countText = `${displayed().length} ${displayed().length === 1 ? 'station' : 'stations'}`;
+  $('result-count').textContent = loading && view === 'discover' ? (results ? `${countText} found. Searching the directory…` : 'Searching…') : countText;
+  document.querySelectorAll('[data-genre]').forEach(button => {
+    button.setAttribute('aria-pressed', button.dataset.genre === genre);
+    button.classList.toggle('selected', button.dataset.genre === genre);
+  });
+  if (loading && results === null && view === 'discover') { $('stations').innerHTML = '<div class="empty">Loading the station directory…</div>'; return; }
   if (!displayed().length) {
-    $('stations').innerHTML = `<div class="empty"><h3>${view === 'favorites' ? 'No saved stations yet' : 'No stations found'}</h3><p>${view === 'favorites' ? 'Use the heart button to save a station.' : 'Try another station name or genre.'}</p><button data-reset>Browse featured stations</button></div>`;
+    $('stations').innerHTML = `<div class="empty"><h3>${view === 'favorites' ? 'No saved stations yet' : 'No stations found'}</h3><p>${view === 'favorites' ? 'Use Save station to save a station.' : 'Try another station name or genre.'}</p><button data-reset>Browse featured stations</button></div>`;
+    if (focusIndex !== undefined) $('list-title').focus();
     return;
   }
-  $('stations').innerHTML = displayed().map((station, index) => `<article class="station-card"><div class="card-art">${artwork(station)}<button class="favorite-button ${isSaved(station) ? 'saved' : ''}" data-save="${index}" aria-label="${isSaved(station) ? 'Remove' : 'Save'} ${escapeHtml(station.name)} ${isSaved(station) ? 'from' : 'to'} favorites" aria-pressed="${isSaved(station)}">${isSaved(station) ? '♥' : '♡'}</button><button class="card-play" data-play="${index}">▶</button></div><div class="card-details"><h3>${escapeHtml(station.name)}</h3><p>${escapeHtml(station.country || 'International')} · ${escapeHtml(station.genre || 'Radio')}</p><div class="card-bottom"><span>${escapeHtml(station.provider || 'Radio')}</span>${isDefault(station) ? '<span class="default-badge">★ Default</span>' : ''}</div></div></article>`).join('');
+  $('stations').innerHTML = displayed().map((station, index) => `<article class="station-card"><div class="card-art" aria-hidden="true">${artwork(station)}</div><div class="card-details"><h3>${escapeHtml(station.name)}</h3><p>${escapeHtml(station.country || 'International')} · ${escapeHtml(station.genre || 'Radio')}</p><div class="card-bottom"><span>${escapeHtml(station.provider || 'Radio')}</span>${isDefault(station) ? '<span class="default-badge">Default station</span>' : ''}</div></div><div class="card-actions"><button class="card-play" data-play="${index}" data-station-id="${escapeHtml(station.id)}">Play station</button><button class="favorite-button ${isSaved(station) ? 'saved' : ''}" data-save="${index}" data-station-id="${escapeHtml(station.id)}" aria-label="${isSaved(station) ? 'Saved station' : 'Save station'}: ${escapeHtml(station.name)}${isSaved(station) ? '. Remove from favorites' : ''}" aria-pressed="${isSaved(station)}">${isSaved(station) ? 'Saved' : 'Save station'}</button></div></article>`).join('');
   updatePlayback();
+  if (focusIndex !== undefined) {
+    const buttons = [...document.querySelectorAll(`[data-${focusAction}]`)];
+    const target = buttons.find(button => button.dataset.stationId === focusStationId) || buttons[Math.min(Number(focusIndex), buttons.length - 1)];
+    target?.focus({preventScroll:true});
+  }
 }
 async function search() {
   request?.abort();
   const controller = new AbortController();
   request = controller;
-  loading = true; results = null;
+  const local = matchingFeatured($('query').value.trim(), genre);
+  loading = true; results = local.length ? local : null;
   notice('directory-error'); renderStations();
   try { const rows = await searchStations($('query').value.trim(), genre, controller.signal); if (!controller.signal.aborted) results = rows; }
   catch (error) { if (!controller.signal.aborted) notice('directory-error', error.message); }
@@ -166,10 +192,23 @@ function updateVolume() {
   audio.volume = volume; audio.muted = muted;
   $('volume').value = Math.round(volume * 100);
   $('volume-value').textContent = `${muted ? 0 : Math.round(volume * 100)}%`;
-  $('mute').textContent = muted ? '×' : '♪';
-  $('mute').setAttribute('aria-label', muted ? 'Unmute' : 'Mute');
+  $('volume').setAttribute('aria-valuetext', `${Math.round(volume * 100)} percent${muted ? ', muted' : ''}`);
+  $('volume-slider').hidden = deviceVolume;
+  $('device-volume').hidden = !deviceVolume;
+  $('mute').textContent = muted ? 'Unmute audio' : 'Mute audio';
+  $('mute').setAttribute('aria-label', muted ? 'Unmute audio' : 'Mute audio');
   $('mute').setAttribute('aria-pressed', muted);
 }
+function updateTextSize() {
+  document.documentElement.classList.toggle('large-text', largeText);
+  $('large-text').setAttribute('aria-pressed', largeText);
+}
+$('large-text').addEventListener('click', () => {
+  largeText = !largeText;
+  updateTextSize();
+  persist('large_text', largeText);
+  $('settings-status').textContent = largeText ? 'Larger text is on.' : 'Larger text is off.';
+});
 $('play-button').addEventListener('click', () => togglePlay());
 $('save-current').addEventListener('click', () => toggleFavorite(selected));
 $('default-current').addEventListener('click', toggleDefault);
@@ -189,8 +228,9 @@ $('volume').addEventListener('change', () => { persist('volume', volume); persis
 $('mute').addEventListener('click', () => { muted = !muted; updateVolume(); persist('muted', muted); });
 $('clear-settings').addEventListener('click', () => {
   if (!clearCookies()) { notice('storage-error', 'The browser could not remove all saved settings. Clear this site’s cookies in your browser settings.'); return; }
-  favorites = []; defaultStation = null; volume = 0.7; muted = false;
-  notice('storage-error', 'Saved settings were cleared.'); updateVolume(); renderPlayer(); renderStations();
+  favorites = []; defaultStation = null; volume = 0.7; muted = false; largeText = false;
+  notice('storage-error', 'Saved settings were cleared.'); updateVolume(); updateTextSize(); renderPlayer(); renderStations();
 });
-renderPlayer(); renderStations(); updateVolume();
+$('genres').innerHTML = ['All stations','Jazz','Chill','Rock','Electronic','Classical','News'].map(g => `<button data-genre="${g}" aria-pressed="false" class="chip">${g}</button>`).join('');
+updateTextSize(); renderPlayer(); renderStations(); updateVolume();
 if (defaultStation) play(defaultStation);

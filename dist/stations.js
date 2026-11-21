@@ -35,13 +35,17 @@ export function normalizeStations(rows) {
   });
 }
 
-export async function searchStations(query, genre, signal) {
-  signal.throwIfAborted();
+export function matchingFeatured(query, genre) {
   const terms = query.trim().toLowerCase().split(/\s+/).filter(Boolean);
-  const local = featured.filter(station => {
+  return featured.filter(station => {
     const text = `${station.name} ${station.country} ${station.genre}`.toLowerCase();
     return terms.every(term => text.includes(term)) && (genre === 'All stations' || station.genre.toLowerCase() === genre.toLowerCase());
   });
+}
+
+export async function searchStations(query, genre, signal) {
+  signal.throwIfAborted();
+  const local = matchingFeatured(query, genre);
   const params = new URLSearchParams({ name: query, hidebroken: 'true', order: 'votes', reverse: 'true', limit: '100', is_https: 'true' });
   if (genre !== 'All stations') params.set('tag', genre.toLowerCase());
   const servers = ['https://de1.api.radio-browser.info', 'https://nl1.api.radio-browser.info'];

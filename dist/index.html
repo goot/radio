@@ -2,38 +2,42 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#111411">
   <meta name="description" content="Select a radio station, save your favorites, and listen live. No account needed.">
   <title>Airwave — Your radio</title>
-  <link rel="stylesheet" href="./style.css">
+  <link rel="stylesheet" href="./style.css?v=20261121-2">
 </head>
 <body>
+  <a class="skip-link" href="#play-button">Skip to radio player</a>
   <div class="layout">
     <aside class="sidebar">
-      <a class="brand" href="./"><span class="brand-icon">◉</span> airwave<span class="green">.</span></a>
+      <a class="brand" href="./" aria-label="Airwave home"><span class="brand-icon" aria-hidden="true">◉</span> airwave<span class="green" aria-hidden="true">.</span></a>
       <p class="nav-label">YOUR RADIO</p>
-      <nav aria-label="Main navigation"><button id="discover" class="nav-button active">◎ <span>Discover</span></button><button id="favorites" class="nav-button">♡ <span>Favorites</span><span id="favorite-count" class="count">0</span></button></nav>
+      <nav aria-label="Station views"><button id="discover" class="nav-button active" aria-pressed="true"><span aria-hidden="true">◎</span> <span>Discover</span></button><button id="favorites" class="nav-button" aria-pressed="false"><span aria-hidden="true">♡</span> <span>Favorites</span><span id="favorite-count" class="count" aria-hidden="true">0</span></button></nav>
       <div class="side-note"><span class="headphones" aria-hidden="true">♫</span><strong>Your station.<br>Your sound.</strong><p>Select a station.<br>Listen live.</p></div>
       <p class="side-footer">NO ACCOUNT NEEDED</p>
     </aside>
     <main>
-      <header><span>LIVE INTERNET RADIO</span><span class="header-note">A world of sound.</span></header>
-      <section class="intro"><p class="eyebrow">MAKE YOURSELF AT HOME</p><h1>Your radio. Always here.</h1><p>Choose a station. Save a favorite. Make it your default.</p></section>
+      <header><span class="header-note">Live internet radio</span><button id="large-text" class="text-size-button" aria-pressed="false"><span aria-hidden="true">Aa</span> Larger text</button></header>
+      <section class="intro"><h1>Your radio.</h1><p>Choose a station. Press Play.</p></section>
       <section id="main-player" class="main-player lime" aria-label="Current station">
-        <div class="station-identity"><div id="station-art" class="station-art" aria-hidden="true"></div><div class="station-copy"><p id="play-status" class="eyebrow" role="status">READY TO PLAY</p><h2 id="station-name">Groove Salad</h2><p id="station-detail">United States · Chill</p><div class="station-actions"><button id="save-current" class="subtle-button">♡ Save station</button><button id="default-current" class="subtle-button">☆ Set as default</button><a id="station-site" target="_blank" rel="noreferrer">Station website ↗</a></div></div></div>
+        <div class="station-identity"><div id="station-art" class="station-art" aria-hidden="true"></div><div class="station-copy"><p id="play-status" class="eyebrow">Ready to play</p><h2 id="station-name">Groove Salad</h2><p id="station-detail">United States · Chill</p></div></div>
         <button id="play-button" class="big-play" aria-label="Play radio"><span id="play-icon" aria-hidden="true">▶</span><span id="play-label">Play</span></button>
-        <div class="player-bottom"><p id="default-note">Set a default station to play when you return.</p><div class="volume"><button id="mute" aria-label="Mute">♪</button><label for="volume">Volume</label><input id="volume" type="range" min="0" max="100" value="70"><output id="volume-value" for="volume">70%</output></div></div>
+        <p id="playback-announcement" class="sr-only" role="status" aria-atomic="true"></p>
+        <div class="station-actions"><button id="save-current" class="subtle-button">Save station</button><button id="default-current" class="subtle-button">Set as default</button></div>
+        <div class="player-bottom"><p id="default-note">Set a default station to play when you return.</p><div class="volume"><button id="mute" aria-label="Mute audio">Mute audio</button><div id="volume-slider" class="volume-slider"><label for="volume">Volume</label><input id="volume" type="range" min="0" max="100" value="70"><output id="volume-value" for="volume" aria-live="off">70%</output></div><p id="device-volume" hidden>Use the volume buttons on your iPhone or iPad.</p></div><a id="station-site" target="_blank" rel="noreferrer">Station website <span class="sr-only">(opens in a new tab)</span></a></div>
       </section>
+      <p id="settings-status" class="sr-only" role="status" aria-atomic="true"></p>
       <p id="play-error" class="notice" role="alert" hidden></p>
       <p id="storage-error" class="notice" role="status" hidden></p>
-      <section id="browse-controls" aria-label="Find stations"><form id="search-form" class="search"><span aria-hidden="true">⌕</span><input id="query" aria-label="Search station names" placeholder="Search stations by name or call letters…"><button type="submit">Search</button></form><div id="genres" class="genres" aria-label="Filter by genre"></div></section>
-      <section aria-label="Stations"><div class="section-heading"><h2 id="list-title">Featured stations</h2><span id="result-count"></span></div><p id="directory-error" class="notice" role="alert" hidden></p><div id="stations" class="station-grid"></div></section>
+      <section id="browse-controls" aria-label="Find stations"><form id="search-form" class="search" role="search"><label for="query">Find a station</label><div class="search-row"><input id="query" type="search" enterkeyhint="search" placeholder="Station name or call letters" autocomplete="off" spellcheck="false"><button type="submit">Search</button></div></form><div id="genres" class="genres" role="group" aria-label="Filter by genre"></div></section>
+      <section aria-label="Stations"><div class="section-heading"><h2 id="list-title" tabindex="-1">Featured stations</h2><a class="back-to-player" href="#play-button">Back to player</a></div><p id="result-count" role="status" aria-atomic="true"></p><p id="directory-error" class="notice" role="alert" hidden></p><div id="stations" class="station-grid"></div></section>
       <footer><p>Settings stay in this browser for up to one year.<br>Clearing cookies removes your saved stations and settings.</p><p>Stations from <a href="https://somafm.com" target="_blank" rel="noreferrer">SomaFM</a>, <a href="https://1059wmex.com" target="_blank" rel="noreferrer">WMEX</a>, and <a href="https://www.radio-browser.info" target="_blank" rel="noreferrer">Radio Browser</a>.</p><button id="clear-settings">Clear saved settings</button></footer>
     </main>
   </div>
   <audio id="audio" preload="none"></audio>
   <noscript>Enable JavaScript to search for stations and play radio.</noscript>
-  <script type="module" src="./app.js"></script>
+  <script type="module" src="./app.js?v=20261121-2"></script>
 </body>
 </html>

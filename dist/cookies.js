@@ -1,4 +1,4 @@
-import { secureUrl } from './stations.js';
+import { secureUrl } from './stations.js?v=20261121-2';
 
 export const cookiePrefix = 'airwave_';
 const cookiePath = new URL('.', location.href).pathname;
