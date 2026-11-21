@@ -13,6 +13,8 @@ The player shows the station logo when the directory supplies one. It shows the 
 
 On iPhone, the app shows one station card per row. Controls have text labels and large touch areas. Select **Larger text** to increase the text size. The app saves this setting in a cookie. Browser zoom remains available. Use **Back to player** to return to the main Play/Pause button.
 
+In landscape orientation on a phone or tablet, the player fills the available screen. The station name, logo, and Play/Pause button remain visible. Select **Stations & settings** to browse stations or change settings. Select **Player view** to return. Large text can require vertical scrolling on a short screen; controls are not clipped.
+
 On iPhone and iPad, use the device volume buttons. The app hides its volume slider on these devices. The **Mute audio** button remains available.
 
 ## Add to the iPhone Home Screen
@@ -30,6 +32,8 @@ The editable icon is `dist/icons/airwave.svg`. The app includes PNG icons at 32,
 Search for `WMEX` with **All stations** selected to find **WMEX-LP 105.9 FM** in Rochester, New Hampshire. Matching featured stations appear before the network request finishes.
 
 The app tries to play the default station on page load. A browser can block automatic audio until you press Play. The app cannot override this browser rule. Pause disconnects the stream. Play returns to the live broadcast.
+
+When the app returns to the foreground, it also tries to resume a stream that it was playing before an interruption. A pause made with the app's Pause button stays paused. The same browser audio restrictions apply to resume. See [WebKit's audio policy](https://webkit.org/blog/6784/new-video-policies-for-ios/).
 
 ## Run locally
 
@@ -81,7 +85,7 @@ The app limits its cookie data to 6 KB to avoid large request headers. It also l
 With Node.js 22 or later:
 
 ```sh
-node --test tests/radio.test.mjs
+node --test tests/*.test.mjs
 node --check dist/app.js
 ```
 

@@ -25,7 +25,7 @@ jobs:
         uses: actions/checkout@v6
       - name: Check the app
         run: |
-          node --test tests/radio.test.mjs
+          node --test tests/*.test.mjs
           node --check dist/app.js
           node --check dist/stations.js
           node --check dist/cookies.js

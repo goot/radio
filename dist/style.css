@@ -51,6 +51,8 @@ header { display: flex; flex-wrap: wrap; align-items: center; justify-content: s
 .intro h1 { font-size: 2rem; line-height: 1.2; margin-bottom: .5rem; letter-spacing: -.03em; }
 .intro p { color: var(--muted); margin: 0; }
 .main-player { display: grid; grid-template-columns: minmax(0, 1fr) 200px; align-items: center; gap: 1.5rem; padding: 1.5rem; background: #222e1b; border: 2px solid #859974; border-radius: 18px; scroll-margin-top: 1rem; }
+.player-toolbar { display: none; }
+.main-player > .notice { grid-column: 1 / -1; margin: 0; }
 .station-identity { display: flex; align-items: center; gap: 1.3rem; min-width: 0; }
 .station-art { flex: 0 0 140px; border-radius: 12px; overflow: hidden; }
 .station-copy { min-width: 0; }
@@ -186,3 +188,49 @@ html.large-text .station-copy { flex: 1 1 180px; }
 html.large-text .station-actions, html.large-text .card-actions { grid-template-columns: minmax(0, 1fr); }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; } }
 @media (forced-colors: active) { button, input, .station-card, .main-player { border-color: ButtonText; } :focus-visible { outline: 4px solid Highlight; box-shadow: none; } }
+
+/* A screen-sized player for landscape phones and the optional Player view. */
+html.player-focus body { padding: 0; }
+html.player-focus .layout { display: block; }
+html.player-focus .sidebar,
+html.player-focus main > :not(#main-player):not(.sr-only),
+html.player-focus .station-actions,
+html.player-focus .player-bottom { display: none; }
+html.player-focus main { max-width: none; padding: 0; }
+html.player-focus .main-player {
+  min-height: 100vh;
+  min-height: 100dvh;
+  grid-template-columns: minmax(0, 1.5fr) minmax(180px, 1fr);
+  grid-template-rows: auto 1fr;
+  align-items: stretch;
+  gap: 1rem 1.5rem;
+  padding: max(16px, env(safe-area-inset-top)) max(20px, env(safe-area-inset-right)) max(16px, env(safe-area-inset-bottom)) max(20px, env(safe-area-inset-left));
+  border: 0;
+  border-radius: 0;
+  background: #111a0c;
+}
+html.player-focus .player-toolbar { grid-column: 1 / -1; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: .5rem 1rem; }
+.player-brand { color: var(--green); font-size: 1.5rem; font-weight: 800; letter-spacing: -.05em; }
+html.player-focus .station-identity { display: flex; flex-wrap: nowrap; align-items: center; gap: 1.2rem; min-width: 0; }
+html.player-focus .station-art { flex: 0 0 clamp(88px, 22vh, 220px); }
+html.player-focus .artwork.large { height: clamp(88px, 22vh, 220px); }
+html.player-focus .station-copy { flex: 1; min-width: 0; }
+html.player-focus .station-copy h2 { font-size: 2.2rem; line-height: 1.15; }
+html.player-focus .station-copy > p:last-child { font-size: 1rem; }
+html.player-focus .eyebrow { font-size: 1rem; }
+html.player-focus .big-play { min-height: 170px; height: 100%; align-self: stretch; display: flex; flex-direction: column; gap: 1rem; font-size: 2.1rem; border-radius: 24px; }
+html.player-focus #play-icon { font-size: 3.5rem; }
+html.player-focus .main-player > .notice { align-self: end; }
+@media (max-width: 760px) and (orientation: landscape) {
+  html.player-focus .station-identity { flex-direction: column; justify-content: center; align-items: start; gap: .7rem; }
+  html.player-focus .station-art { flex-basis: auto; width: 80px; }
+  html.player-focus .artwork.large { height: 80px; }
+  html.player-focus .station-copy { flex: 0 1 auto; }
+  html.player-focus .station-copy h2 { font-size: 1.7rem; }
+}
+@media (orientation: portrait) {
+  html.player-focus .main-player { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto auto 1fr; }
+  html.player-focus .station-copy h2 { font-size: 1.8rem; }
+  html.player-focus .station-art { flex-basis: 88px; }
+  html.player-focus .artwork.large { height: 88px; }
+}
