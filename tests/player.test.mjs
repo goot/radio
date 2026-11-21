@@ -2,20 +2,17 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { featured } from '../dist/stations.js';
 
-test('landscape startup plays the saved default; resume keeps a user pause', async () => {
+test('startup opens Player view without an orientation requirement and plays the saved default; resume keeps a user pause', async () => {
   const station = featured.find(s => s.id === 'wmex-lp-1059');
   const jar = new Map([['airwave_default', encodeURIComponent(JSON.stringify(station))]]);
   const rootClasses = new Set();
   const elements = new Map();
   const documentListeners = new Map();
   const windowListeners = new Map();
-  let orientationChanged;
   let focus;
   let plays = 0;
-  const query = {matches:true,addEventListener(name,fn){orientationChanged=fn;}};
   globalThis.location = new URL('https://example.com/radio/');
   Object.defineProperty(globalThis,'navigator',{configurable:true,value:{userAgent:'iPhone',platform:'iPhone',maxTouchPoints:5}});
-  globalThis.matchMedia = () => query;
   globalThis.addEventListener = (name, fn) => windowListeners.set(name,fn);
   globalThis.scrollTo = () => {};
   function element(id) {
@@ -58,10 +55,7 @@ test('landscape startup plays the saved default; resume keeps a user pause', asy
   element('focus-player').listeners.click();
   assert.equal(rootClasses.has('player-focus'),true);
   assert.equal(focus,'play-button');
-  query.matches=false;
-  orientationChanged({matches:false});
-  assert.equal(rootClasses.has('player-focus'),false);
-  assert.equal(plays,1,'rotation must not restart the stream');
+  assert.equal(plays,1,'changing views must not restart the stream');
 
   const activeAudio = element('audio');
   activeAudio.paused=true;

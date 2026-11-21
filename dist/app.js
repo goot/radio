@@ -1,5 +1,5 @@
-import { featured, matchingFeatured, searchStations, secureUrl } from './stations.js?v=20261121-4';
-import { readCookie, writeCookie, readFavorites, validStation, clearCookies } from './cookies.js?v=20261121-4';
+import { featured, matchingFeatured, searchStations, secureUrl } from './stations.js?v=20261121-5';
+import { readCookie, writeCookie, readFavorites, validStation, clearCookies } from './cookies.js?v=20261121-5';
 
 const $ = id => document.getElementById(id);
 const colors = ['lime', 'purple', 'orange', 'blue', 'pink', 'yellow'];
@@ -10,12 +10,6 @@ let selected = defaultStation || featured[0];
 let view = 'discover', genre = 'All stations', results = null, loading = false;
 let status = 'idle', request, timeout, generation = 0;
 let playbackWanted = false;
-const landscapeQuery = globalThis.matchMedia?.('(orientation: landscape) and (max-height: 600px), (orientation: landscape) and (max-width: 1400px) and (pointer: coarse)');
-function landscapeMatches() {
-  const orientation = globalThis.screen?.orientation?.type;
-  return !!landscapeQuery?.matches && (!orientation || orientation.startsWith('landscape'));
-}
-let lastLandscape = landscapeMatches();
 let audio = $('audio');
 const savedVolume = readCookie('volume');
 let volume = typeof savedVolume === 'number' && savedVolume >= 0 && savedVolume <= 1 ? savedVolume : 0.7;
@@ -235,16 +229,7 @@ function setPlayerView(enabled, moveFocus = false) {
 }
 $('focus-player').addEventListener('click', () => setPlayerView(true, true));
 $('player-settings').addEventListener('click', () => setPlayerView(false, true));
-function updateOrientation() {
-  const landscape = landscapeMatches();
-  if (landscape === lastLandscape) return;
-  lastLandscape = landscape;
-  setPlayerView(landscape, true);
-}
-landscapeQuery?.addEventListener('change', updateOrientation);
-globalThis.screen?.orientation?.addEventListener('change', updateOrientation);
 document.querySelectorAll('.back-to-player, .skip-link').forEach(link => link.addEventListener('click', event => {
-  if (!landscapeMatches()) return;
   event.preventDefault();
   setPlayerView(true, true);
 }));
@@ -278,5 +263,5 @@ $('clear-settings').addEventListener('click', () => {
 });
 $('genres').innerHTML = ['All stations','Jazz','Chill','Rock','Electronic','Classical','News'].map(g => `<button data-genre="${g}" aria-pressed="false" class="chip">${g}</button>`).join('');
 updateTextSize(); renderPlayer(); renderStations(); updateVolume();
-setPlayerView(lastLandscape);
+setPlayerView(true);
 if (defaultStation) play(defaultStation);

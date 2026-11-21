@@ -13,7 +13,7 @@ The player shows the station logo when the directory supplies one. It shows the 
 
 On iPhone, the app shows one station card per row. Controls have text labels and large touch areas. Select **Larger text** to increase the text size. The app saves this setting in a cookie. Browser zoom remains available. Use **Back to player** to return to the main Play/Pause button.
 
-In landscape orientation on a phone or tablet, the player fills the available screen. The station name, logo, and Play/Pause button remain visible. Select **Stations & settings** to browse stations or change settings. Select **Player view** to return. Large text can require vertical scrolling on a short screen; controls are not clipped.
+The site always opens in Player view, in portrait and landscape orientation. The player fills the available screen. The station name, logo, and Play/Pause button remain visible. Select **Stations & settings** to browse stations or change settings. Select **Player view** to return. Rotating the device keeps the selected view. Large text can require vertical scrolling on a short screen; controls are not clipped.
 
 On iPhone and iPad, use the device volume buttons. The app hides its volume slider on these devices. The **Mute audio** button remains available.
 
