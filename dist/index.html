@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#111411">
+  <meta name="description" content="Select a radio station, save your favorites, and listen live. No account needed.">
+  <title>Airwave — Your radio</title>
+  <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+  <div class="layout">
+    <aside class="sidebar">
+      <a class="brand" href="./"><span class="brand-icon">◉</span> airwave<span class="green">.</span></a>
+      <p class="nav-label">YOUR RADIO</p>
+      <nav aria-label="Main navigation"><button id="discover" class="nav-button active">◎ <span>Discover</span></button><button id="favorites" class="nav-button">♡ <span>Favorites</span><span id="favorite-count" class="count">0</span></button></nav>
+      <div class="side-note"><span class="headphones" aria-hidden="true">♫</span><strong>Your station.<br>Your sound.</strong><p>Select a station.<br>Listen live.</p></div>
+      <p class="side-footer">NO ACCOUNT NEEDED</p>
+    </aside>
+    <main>
+      <header><span>LIVE INTERNET RADIO</span><span class="header-note">A world of sound.</span></header>
+      <section class="intro"><p class="eyebrow">MAKE YOURSELF AT HOME</p><h1>Your radio. Always here.</h1><p>Choose a station. Save a favorite. Make it your default.</p></section>
+      <section id="main-player" class="main-player lime" aria-label="Current station">
+        <div class="station-identity"><div id="station-art" class="station-art" aria-hidden="true"></div><div class="station-copy"><p id="play-status" class="eyebrow" role="status">READY TO PLAY</p><h2 id="station-name">Groove Salad</h2><p id="station-detail">United States · Chill</p><div class="station-actions"><button id="save-current" class="subtle-button">♡ Save station</button><button id="default-current" class="subtle-button">☆ Set as default</button><a id="station-site" target="_blank" rel="noreferrer">Station website ↗</a></div></div></div>
+        <button id="play-button" class="big-play" aria-label="Play radio"><span id="play-icon" aria-hidden="true">▶</span><span id="play-label">Play</span></button>
+        <div class="player-bottom"><p id="default-note">Set a default station to play when you return.</p><div class="volume"><button id="mute" aria-label="Mute">♪</button><label for="volume">Volume</label><input id="volume" type="range" min="0" max="100" value="70"><output id="volume-value" for="volume">70%</output></div></div>
+      </section>
+      <p id="play-error" class="notice" role="alert" hidden></p>
+      <p id="storage-error" class="notice" role="status" hidden></p>
+      <section id="browse-controls" aria-label="Find stations"><form id="search-form" class="search"><span aria-hidden="true">⌕</span><input id="query" aria-label="Search station names" placeholder="Search stations by name or call letters…"><button type="submit">Search</button></form><div id="genres" class="genres" aria-label="Filter by genre"></div></section>
+      <section aria-label="Stations"><div class="section-heading"><h2 id="list-title">Featured stations</h2><span id="result-count"></span></div><p id="directory-error" class="notice" role="alert" hidden></p><div id="stations" class="station-grid"></div></section>
+      <footer><p>Settings stay in this browser for up to one year.<br>Clearing cookies removes your saved stations and settings.</p><p>Stations from <a href="https://somafm.com" target="_blank" rel="noreferrer">SomaFM</a> and <a href="https://www.radio-browser.info" target="_blank" rel="noreferrer">Radio Browser</a>.</p><button id="clear-settings">Clear saved settings</button></footer>
+    </main>
+  </div>
+  <audio id="audio" preload="none"></audio>
+  <noscript>Enable JavaScript to search for stations and play radio.</noscript>
+  <script type="module" src="./app.js"></script>
+</body>
+</html>
