@@ -15,6 +15,8 @@ On iPhone, the app shows one station card per row. Controls have text labels and
 
 The site always opens in Player view, in portrait and landscape orientation. The player fills the available screen. The station name, logo, and Play/Pause button remain visible. Select **Stations & settings** to browse stations or change settings. Select **Player view** to return. Rotating the device keeps the selected view. Large text can require vertical scrolling on a short screen; controls are not clipped.
 
+The iPhone Home Screen app can restore a suspended page. Returning to the app or restoring a page from browser history now returns to Player view and resets the scroll position. This does not override an audio block or resume audio that you paused with the app's Pause button.
+
 On iPhone and iPad, use the device volume buttons. The app hides its volume slider on these devices. The **Mute audio** button remains available.
 
 ## Add to the iPhone Home Screen

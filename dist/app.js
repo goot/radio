@@ -1,5 +1,5 @@
-import { featured, matchingFeatured, searchStations, secureUrl } from './stations.js?v=20261121-5';
-import { readCookie, writeCookie, readFavorites, validStation, clearCookies } from './cookies.js?v=20261121-5';
+import { featured, matchingFeatured, searchStations, secureUrl } from './stations.js?v=20261121-6';
+import { readCookie, writeCookie, readFavorites, validStation, clearCookies } from './cookies.js?v=20261121-6';
 
 const $ = id => document.getElementById(id);
 const colors = ['lime', 'purple', 'orange', 'blue', 'pink', 'yellow'];
@@ -132,8 +132,18 @@ function resumeAudio() {
   // Reuse the audio element that the user already permitted to play.
   startAudio(generation);
 }
-document.addEventListener('visibilitychange', resumeAudio);
-globalThis.addEventListener?.('pageshow', event => { if (event.persisted) resumeAudio(); });
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState !== 'visible') return;
+  // A Home Screen app often resumes its existing document instead of loading again.
+  setPlayerView(true, true);
+  resumeAudio();
+});
+globalThis.addEventListener?.('pageshow', event => {
+  setPlayerView(true, !!event.persisted);
+  globalThis.scrollTo?.({top:0,behavior:'instant'});
+  if (event.persisted) resumeAudio();
+});
+if (globalThis.history && 'scrollRestoration' in globalThis.history) globalThis.history.scrollRestoration = 'manual';
 function togglePlay(station = selected) {
   if (station.id === selected.id && (status === 'playing' || status === 'loading')) { stop(); notice('play-error'); }
   else play(station);

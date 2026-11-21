@@ -14,6 +14,7 @@ test('startup opens Player view without an orientation requirement and plays the
   globalThis.location = new URL('https://example.com/radio/');
   Object.defineProperty(globalThis,'navigator',{configurable:true,value:{userAgent:'iPhone',platform:'iPhone',maxTouchPoints:5}});
   globalThis.addEventListener = (name, fn) => windowListeners.set(name,fn);
+  globalThis.history = {scrollRestoration:'auto'};
   globalThis.scrollTo = () => {};
   function element(id) {
     if (!elements.has(id)) elements.set(id, {
@@ -48,6 +49,7 @@ test('startup opens Player view without an orientation requirement and plays the
   assert.equal(element('audio').src,station.url);
   assert.equal(element('play-label').textContent,'Pause');
   assert.equal(rootClasses.has('player-focus'),true);
+  assert.equal(history.scrollRestoration,'manual');
 
   element('player-settings').listeners.click();
   assert.equal(rootClasses.has('player-focus'),false);
@@ -58,6 +60,8 @@ test('startup opens Player view without an orientation requirement and plays the
   assert.equal(plays,1,'changing views must not restart the stream');
 
   const activeAudio = element('audio');
+  element('player-settings').listeners.click();
+  assert.equal(rootClasses.has('player-focus'),false);
   activeAudio.paused=true;
   document.visibilityState='hidden';
   documentListeners.get('visibilitychange')();
@@ -65,11 +69,16 @@ test('startup opens Player view without an orientation requirement and plays the
   document.visibilityState='visible';
   documentListeners.get('visibilitychange')();
   assert.equal(plays,2);
+  assert.equal(rootClasses.has('player-focus'),true,'Home Screen foreground must restore Player view');
   assert.equal(element('audio'),activeAudio,'resume must reuse the permitted audio element');
 
   element('play-button').listeners.click();
   assert.equal(element('play-label').textContent,'Play');
   documentListeners.get('visibilitychange')();
+  element('player-settings').listeners.click();
+  assert.equal(rootClasses.has('player-focus'),false);
   windowListeners.get('pageshow')({persisted:true});
+  assert.equal(rootClasses.has('player-focus'),true,'page-cache restore must restore Player view');
+  assert.equal(focus,'play-button');
   assert.equal(plays,2,'manual pause must prevent foreground and page-cache resume');
 });
