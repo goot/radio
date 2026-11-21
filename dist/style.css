@@ -11,7 +11,7 @@
 }
 html.large-text { font-size: 137.5%; }
 * { box-sizing: border-box; }
-body { margin: 0; }
+body { margin: 0; padding-top: env(safe-area-inset-top); }
 button, input { font: inherit; }
 button, input, a { touch-action: manipulation; }
 button { cursor: pointer; color: inherit; min-height: 56px; min-width: 56px; padding: .7rem 1rem; font-weight: 650; border-radius: 10px; border: 2px solid var(--line); background: #20271c; line-height: 1.35; overflow-wrap: anywhere; }

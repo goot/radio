@@ -1,5 +1,5 @@
-import { featured, matchingFeatured, searchStations, secureUrl } from './stations.js?v=20261121-2';
-import { readCookie, writeCookie, readFavorites, validStation, clearCookies } from './cookies.js?v=20261121-2';
+import { featured, matchingFeatured, searchStations, secureUrl } from './stations.js?v=20261121-3';
+import { readCookie, writeCookie, readFavorites, validStation, clearCookies } from './cookies.js?v=20261121-3';
 
 const $ = id => document.getElementById(id);
 const colors = ['lime', 'purple', 'orange', 'blue', 'pink', 'yellow'];

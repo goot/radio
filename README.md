@@ -15,6 +15,18 @@ On iPhone, the app shows one station card per row. Controls have text labels and
 
 On iPhone and iPad, use the device volume buttons. The app hides its volume slider on these devices. The **Mute audio** button remains available.
 
+## Add to the iPhone Home Screen
+
+1. Open the site in Safari.
+2. Open the **Share** menu.
+3. Select **Add to Home Screen**.
+4. Enable **Open as Web App** if the option appears.
+5. Select **Add**.
+
+The Home Screen icon uses a green radio on a dark background. Its name is **Airwave**. If you saved an older icon, remove that shortcut and add the site again. Live radio still needs an internet connection.
+
+The editable icon is `dist/icons/airwave.svg`. The app includes PNG icons at 32, 180, 192, and 512 pixels. The 180-pixel icon is for iPhone. The web app manifest uses relative paths so installation also works under `/radio/`.
+
 Search for `WMEX` with **All stations** selected to find **WMEX-LP 105.9 FM** in Rochester, New Hampshire. Matching featured stations appear before the network request finishes.
 
 The app tries to play the default station on page load. A browser can block automatic audio until you press Play. The app cannot override this browser rule. Pause disconnects the stream. Play returns to the live broadcast.
